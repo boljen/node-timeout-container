@@ -1,0 +1,28 @@
+{
+  "name": "timeout-container",
+  "version": "0.0.0",
+  "description": "A container with timeout functionality",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --reporter=spec --check-leaks test/timeoutcontainer.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/boljen/node-timeout-container.git"
+  },
+  "keywords": [
+    "timeout",
+    "container",
+    "TTL"
+  ],
+  "author": "Christophe Bol",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/boljen/node-timeout-container/issues"
+  },
+  "homepage": "https://github.com/boljen/node-timeout-container",
+  "devDependencies": {
+    "mocha": "^2.0.1",
+    "should": "^4.2.0"
+  }
+}
