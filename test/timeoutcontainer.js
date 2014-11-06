@@ -1,115 +1,131 @@
 var TimeoutContainer = require('./../index.js');
 
-setInterval(function() {
-  console.log('ok');
-}, 500);
-
 describe('TimeoutContainer', function() {
+
+  var tc, done = false, notimer = true;
+
+  beforeEach(function() {
+    if (done) {
+      tc = new TimeoutContainer({timeout: 20, interval: 10}, function() {});
+      if(notimer) {
+        tc.stopIntervalTimer = function() {};
+        tc.startIntervalTimer = function(){};
+      }
+    }
+  });
 
   describe('construct', function() {
     it('Should construct', function() {
-      var tc = new TimeoutContainer(1000, 200, function() {
+      var tc = new TimeoutContainer({timeout: 1000}, function() {});
+    });
+    after(function() {
+      done = true;
+    });
+  });
 
+  describe('setTimout', function() {
+    it('Should update the timeout', function() {
+      tc.setTimeout(14000);
+      tc._timeout.should.equal(14000);
+    });
+  });
+
+  describe('setCallback', function() {
+    it('Should set the callback', function() {
+      var fx = function(){};
+      tc.setCallback(fx);
+      tc._callback.should.equal(fx);
+    });
+  });
+
+  describe('push', function() {
+    it('Should add to correct block', function() {
+      tc.push('test');
+      tc._total.should.equal(1);
+      tc._totalInterval.should.equal(1);
+    });
+    it('Should do a keepalive when key already exists', function(done) {
+      tc.keepAlive = function() {
+        done();
+      };
+      tc.push('test');
+      tc.push('test');
+    });
+    it('Should start interval if none is started', function(done) {
+      tc.startIntervalTimer = function() {
+        tc.startIntervalTimer = function() {
+          throw new Error("Should not happen");
+        };
+        // Make sure to do this on the next tick
+        setTimeout(function() {
+          tc.push('test2');
+          done();
+        }, 0);
+      }
+      tc.push('test');
+    });
+  })
+
+
+  describe('pull', function() {
+    it('Should pull to correct key from the stack', function() {
+      tc.push('test');
+      tc.pull('test').should.be.true;
+    });
+    it('Should timeout', function(done) {
+      tc.push('test', 2);
+      setTimeout(function() {
+        tc.pull('test').should.be.false;
+        done();
+      }, 1);
+    });
+    it('Should stop interval if no more intervalled keys', function(done) {
+      tc.stopIntervalTimer = function() {
+        tc.stopIntervalTimer = function() {
+          throw new Error("Should not happen");
+        };
+        // Make sure to do this on the next tick
+        setTimeout(function() {
+          tc.pull('test');
+          done();
+        }, 0);
+      };
+      tc.push('test');
+      tc.pull('test');
+    });
+  });
+
+  describe('clearInterval', function() {
+    it('Should clear the interval, do timeout callbacks, and move on', function() {
+      tc.push('test', 1);
+      tc.clearInterval();
+      tc.pull('test').should.be.true;
+      tc.push('test', 1);
+      tc.clearInterval();
+      tc.clearInterval();
+      tc.pull('test').should.be.false;
+    });
+    it('Should stop timer if no interval', function(done) {
+      tc.push('test', 1);
+      tc.stopIntervalTimer = function() {
+        done();
+      };
+      tc.clearInterval();
+      tc.clearInterval();
+    });
+  });
+
+  describe('--integration', function() {
+    before(function() {
+      notimer = false;
+    });
+    it('should callback upon timeout', function(done) {
+      tc.push('test');
+      tc.setCallback(function(k) {
+        k.should.equal('test');
+        done();
       });
     });
-    it('Should start the interval listener', function() {
-
-    });
-    it('Should not start the interval listener if the interval is 0', function() {
-
-    });
   });
-
-  describe.skip('setTimout', function() {
-    it('Should update the timeout', function() {
-
-    });
-  });
-
-  describe.skip('setInterval', function() {
-    it('Should set the interval', function() {
-
-    });
-    it('Should refresh the interval listener', function() {
-
-    });
-  });
-
-  describe.skip('cleanAll', function(){
-    it('Should refresh all the entries', function() {
-
-    });
-  });
-
-  describe.skip('clean', function() {
-    it('Should refresh the specified entry', function() {
-
-    });
-  });
-
-  describe.skip('remove', function() {
-    it('Should remove a key', function() {
-
-    });
-    it('Should remove the custom listener', function() {
-
-    });
-  });
-
-  describe.skip('push', function() {
-    it('Should return the container instance', function() {
-
-    });
-    it('Should add a key to the stack', function() {
-
-    });
-    it('Should add a key to the stack with a custom timeout', function() {
-
-    });
-    it('Should refresh the key if the key already exists', function() {
-
-    });
-    it('Should register the last added key', function() {
-
-    });
-  });
-
-  describe.skip('alive', function() {
-    it('Should return true if alive', function() {
-
-    });
-    it('Should return false if non-existent', function() {
-
-    });
-    it('Should refresh', function() {
-
-    });
-  });
-
-  describe.skip('pull', function() {
-    it('Should remove a key from the stack', function() {
-
-    });
-    it('Should remove custom timeout hooks', function() {
-
-    });
-    it('Should refresh', function() {
-
-    });
-  });
-
-  describe.skip('listen', function() {
-    it('Should hook to the specified key and call the callback', function() {
-
-    });
-    it('Should NOT call the general callback', function() {
-
-    });
-    it('Should call the general callback, if configrured', function() {
-
-    });
-    it('should use the last added key, if none specified');
-  });
-
 
 });
