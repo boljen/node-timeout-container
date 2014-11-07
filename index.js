@@ -78,7 +78,7 @@ TimeoutContainer.prototype.push = function(key, timeout) {
     this._intervals[block] = [];
 
   var index = this._intervals[block].push(key)-1;
-  expire = Date.now();
+  expire = Date.now()+timeout;
 
   this._keys[key] = [block, index, expire];
   if (this._totalInterval === 0)
@@ -130,7 +130,7 @@ TimeoutContainer.prototype.clearInterval = function() {
   }
   if (this._totalInterval === 0)
     this.stopIntervalTimer();
-    
+
   this._nextInterval++;
 };
 

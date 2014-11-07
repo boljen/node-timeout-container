@@ -1,6 +1,6 @@
 {
   "name": "timeout-container",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A container with timeout functionality",
   "main": "index.js",
   "scripts": {
