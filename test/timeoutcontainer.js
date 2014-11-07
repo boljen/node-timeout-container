@@ -70,6 +70,9 @@ describe('TimeoutContainer', function() {
   describe('pull', function() {
     it('Should pull to correct key from the stack', function() {
       tc.push('test');
+      tc.setCallback(function() {
+        throw new Error("Should not happen");
+      })
       tc.pull('test').should.be.true;
     });
     it('Should timeout', function(done) {
@@ -77,7 +80,7 @@ describe('TimeoutContainer', function() {
       setTimeout(function() {
         tc.pull('test').should.be.false;
         done();
-      }, 1);
+      }, 20);
     });
     it('Should stop interval if no more intervalled keys', function(done) {
       tc.stopIntervalTimer = function() {
